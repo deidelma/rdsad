@@ -1,3 +1,5 @@
 realbulkpbmc.rds
 realbulkpbmc.h5seurat
 realbulkpbmc.h5ad
+.DS_Store
+*.rds
