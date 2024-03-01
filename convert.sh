@@ -18,7 +18,7 @@ Help(){
     echo "options:"
     echo "o     Overwrite an existing .h5ad file."
     echo "h     Print this help."
-    echo "V     Print software version and license information."
+    # echo "V     Print software version and license information."
     echo
 }
 
