@@ -23,3 +23,9 @@ if (length(args)==0) {
 message(sprintf("Processing %s", args[1]))
 data <- readRDS(args[1])
 message("File successfully read.")
+
+#
+# split the list into indiviudal files 
+#
+lapply(names(data), function(i)
+  saveRDS(data[i], paste0(i, ".rds")))

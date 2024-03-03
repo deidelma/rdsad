@@ -22,7 +22,7 @@ mamba install -y scanpy -c conda-forge
 echo "scanpy installed"
 mamba install -y R r-seurat r-devtools r-hdf5r -c conda-forge
 echo "R and associated packages installed"
-./rdsad-install.R
+~/scripts/rdsad-install.R
 echo "R packages installed from github"
 echo ""
 echo "Installation complete."
