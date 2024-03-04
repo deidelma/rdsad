@@ -11,15 +11,23 @@ USER meakins
 
 WORKDIR /home/meakins
 
-COPY . /home/meakins
+COPY ./rdsad-install.sh /home/meakins
+COPY ./rdsad-install.R /home/meakins 
+COPY ./install-conda.sh /home/meakins
+COPY ./.gitignore /home/meakins
+COPY ./LICENSE.txt /home/meakins
+COPY ./README.md /home/meakins
 
-RUN curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-RUN chmod -v +x Miniconda3*.sh 
-RUN bash ./Miniconda3*.sh -b
+USER root
+RUN chmod +x rdsad-install.sh 
+RUN chmod +x rdsad-install.R
+RUN chmod +x install-conda.sh
 
-ENV PATH "$PATH:/home/meakins/miniconda3/bin"
+RUN bash ./install-conda.sh 
+ENV PATH "$PATH:/home/meakins/miniconda3/bin:/home/meakins/Miniconda3-latest-Linux-aarch64"
 
 USER meakins 
-
+RUN bash ./Miniconda3*.sh -b
+COPY ./scripts /home/meakins/scripts
 RUN conda init
-RUN ./scripts/rdsad-install.sh 
+RUN ./rdsad-install.sh 
