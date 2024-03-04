@@ -3,3 +3,5 @@ realbulkpbmc.h5seurat
 realbulkpbmc.h5ad
 .DS_Store
 *.rds
+.pytest_cache/
+.vscode/
