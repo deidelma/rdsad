@@ -2,19 +2,21 @@
 #
 # extract_items.R
 #
-# script to extract items from an .rds file containing a list of individual
-# single cell RNA seq experiments and store them as .rds files
+# script to extract individual experiments from an .rds file
+# containing a list of individual single cell RNA seq experiments
+# and store them as .rds files
 #
-# based on https://stackoverflow.com/questions/59838033/saving-dataframes-stored-in-a-list-to-individual-files-in-r
+# based on:
+# https://stackoverflow.com/questions/59838033/saving-dataframes-stored-in-a-list-to-individual-files-in-r
 #
 # Copyright (c) 2024, David Eidelman. MIT License.
 library(Seurat)
 library(SeuratDisk)
 library(stringr)
 
-args = commandArgs(trailingOnly=TRUE)
-if (length(args)==0) {
-	stop("No filename provided.", call.=FALSE)
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) == 0) {
+  stop("No filename provided.", call. = FALSE)
 }
 
 #
@@ -25,7 +27,9 @@ data <- readRDS(args[1])
 message("File successfully read.")
 
 #
-# split the list into indiviudal files 
+# split the list into individual files
 #
-lapply(names(data), function(i)
-  saveRDS(data[i], paste0(i, ".rds")))
+lapply(
+  names(data),
+  function(i) saveRDS(data[i], paste0(i, ".rds"))
+)

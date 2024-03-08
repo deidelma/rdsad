@@ -1,12 +1,18 @@
 {
     "cSpell.words": [
+        "adata",
+        "anndata",
+        "barcodes",
         "fname",
+        "mmread",
         "mojaveazure",
         "myfile",
         "rdsad",
         "ropensci",
         "Rscript",
         "Satija",
-        "satijalab"
+        "satijalab",
+        "scanpy",
+        "tocsr"
     ]
 }

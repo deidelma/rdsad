@@ -5,15 +5,16 @@
 #
 # this script converts .rds files into .h5ad files using the approach outlined
 # by Z.Q. Fang (https://zqfang.github.io/2020-04-28-seurat2scanpy).
-# However, instead of using the method based on MuDataSeurat, which doesn't seem to work
-# as of 2024-02-29, it uses the SeuratDisk method recommended by the SatijaLab, who
-# are the authors of the Seurat system.
+# However, instead of using the method based on MuDataSeurat,
+# which doesn't seem to work
+# as of 2024-02-29, it uses the SeuratDisk method
+# recommended by the SatijaLab, who are the authors of the Seurat system.
 #
 # Copyright (c) 2024 by David Eidelman. All rights reserved.  MIT License.
 #
 #
 
-# to call this script you need to pass in the filename of the file to be converted 
+# to call this script you need to pass in the name of the file to be converted
 # as a parameter to the script.
 #
 # For example:
@@ -28,9 +29,9 @@ library(stringr)
 #
 # check command line
 #
-args = commandArgs(trailingOnly=TRUE)
-if (length(args)==0) {
-	stop("No filename provided.", call.=FALSE)
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) == 0) {
+  stop("No filename provided.", call. = FALSE)
 }
 #
 # load the file
@@ -50,9 +51,7 @@ data@meta.data[i] <- lapply(data@meta.data[i], as.character)
 #
 fname <- stringr::str_replace(args[1], ".rds", ".h5seurat")
 message(sprintf("Creating intermediate file: %s", fname))
-SaveH5Seurat(data, filename=fname, overwrite=TRUE)
+SaveH5Seurat(data, filename = fname, overwrite = TRUE)
 message("Converting file...")
-Convert(fname, dest="h5ad", assay="RNA", overwrite=TRUE)
+Convert(fname, dest = "h5ad", assay = "RNA", overwrite = TRUE)
 message("File successfully converted.")
-
-

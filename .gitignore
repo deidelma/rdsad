@@ -5,3 +5,12 @@ realbulkpbmc.h5ad
 *.rds
 .pytest_cache/
 .vscode/
+*.Identifier
+barcodes.*
+gene_names.*
+features*
+*.mtx
+.RData
+.Rhistory
+*.gz
+*.h5ad
