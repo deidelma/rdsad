@@ -4,7 +4,7 @@
 # rdsad-install.R 
 #
 # This script loads the packages SeuratData and SeuratDisk from their github repositories,
-# thus ensuring compatability with the current version of Seurat.
+# thus ensuring compatibility with the current version of Seurat.
 #
 # Copyright (c) 2024, David Eidelman, MIT license.
 #
@@ -15,3 +15,5 @@ devtools::install_github("satijalab/seurat-data", upgrade=TRUE)
 print("SeuratData successfully installed")
 devtools::install_github("mojaveazure/seurat-disk", upgrade=TRUE)
 print("SeuratDisk successfully installed")
+devtools::install_github("ropensci/fastMatMR")
+print9("fastMatMR successfully installed")

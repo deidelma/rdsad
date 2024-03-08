@@ -26,7 +26,7 @@ conda install -y r-seurat -c conda-forge
 conda install -y r-devtools -c conda-forge
 conda install -y r-hdf5 -c conda-forge
 echo "R and associated packages installed"
-~/rdsad-install.R
+./rdsad-install.R
 echo "R packages installed from github"
 echo ""
 echo "Installation complete."
