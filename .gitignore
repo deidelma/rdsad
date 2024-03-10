@@ -15,3 +15,9 @@ features*
 *.gz
 *.h5ad
 
+Miniconda3-latest-Linux-x86_64.sh
+data/.ipynb_checkpoints/barcodes-checkpoint.tsv
+data/.ipynb_checkpoints/genes-checkpoint.tsv
+scripts/.ipynb_checkpoints/get_assays-checkpoint.R
+data/genes.tsv
+.ipynb_checkpoints/rdsad-checkpoint.ipynb
