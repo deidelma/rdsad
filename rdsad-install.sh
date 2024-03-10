@@ -20,11 +20,18 @@ conda install -y mamba -c conda-forge
 echo "mamba installed"
 mamba install -y scanpy -c conda-forge
 echo "scanpy installed"
+mamba install -y -c conda-forge 'jupyterlab>=4.1.0,<5.0.0a0' jupyterlab-lsp
+echo "jupyter installed"
+mamba install -y -c conda-forge python-lsp-server r-languageserver
+echo "jupyter language servers installed"
+mamba install -y -c conda-forge rpy2
+echo "rpy2 installed"
+
 # mamba install -y R r-seurat r-devtools r-hdf5r -c conda-forge
 conda install -y R -c conda-forge 
 conda install -y r-seurat -c conda-forge 
 conda install -y r-devtools -c conda-forge
-conda install -y r-hdf5 -c conda-forge
+# conda install -y r-hdf5 -c conda-forge
 echo "R and associated packages installed"
 ./rdsad-install.R
 echo "R packages installed from github"

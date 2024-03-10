@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 #
 # install_conda.sh
 # 
@@ -5,7 +6,7 @@
 # designed to be called from a Docker container build or equivalent
 # assumes that curl is already installed
 #
-# copyright (c) 2024 David Eidelman, MIT License
+# copyright (c) 2024 David Eidelman, MIT License.
 #
 
 OS_NAME=$(uname -p);
