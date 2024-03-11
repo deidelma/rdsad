@@ -11,52 +11,111 @@ valid matrix, barcode, and feature information.
 
 Copyright (c) 2024 David Eidelman, MIT License
 """
+
+import argparse
+import sys
+from typing import Any
 import scipy.io
+from scipy.sparse import coo_matrix
 import pandas as pd
 import rpy2.robjects as robjects
 from anndata import AnnData
 from pathlib import Path
 
-RDS_FILE = Path("data/JK06.rds") # need to replace this with a command line argument
-DATA_DIR = Path("data")  # need to make this modifieable
 
-robjects.r("library(Seurat, quietly=TRUE, verbose= FALSE, warn.conflicts=FALSE)")
-robjects.r('library(SeuratData, quietly=TRUE, verbose= FALSE, warn.conflicts=FALSE)')
-robjects.r('library(SeuratDisk, quietly=TRUE, verbose= FALSE, warn.conflicts=FALSE)')
-robjects.r('library(fastMatMR, quietly=TRUE, verbose= FALSE, warn.conflicts=FALSE)')
+def load_R_libraries() -> None:
+    robjects.r("library(Seurat, quietly=TRUE, verbose= FALSE, warn.conflicts=FALSE)")
+    robjects.r(
+        "library(SeuratData, quietly=TRUE, verbose= FALSE, warn.conflicts=FALSE)"
+    )
+    robjects.r(
+        "library(SeuratDisk, quietly=TRUE, verbose= FALSE, warn.conflicts=FALSE)"
+    )
+    robjects.r("library(fastMatMR, quietly=TRUE, verbose= FALSE, warn.conflicts=FALSE)")
 
-read_rds = robjects.r("readRDS")
-rds_data = read_rds(RDS_FILE.as_posix())
 
-seurat_object = robjects.r["CreateSeuratObject"](rds_data)
-mtx = robjects.r["GetAssayData"](seurat_object, assay='RNA', layer='counts')
-robjects.r["write_fmm"](mtx, (DATA_DIR / Path("matrix.mtx")).as_posix())
+def read_rds_file(filename: str) -> Any:
+    read_rds = robjects.r("readRDS")
+    rds_data = read_rds(filename)
 
-rownames = robjects.r["rownames"]
-barcodes = rownames(seurat_object.slots["meta.data"])
+    seurat_object = robjects.r["CreateSeuratObject"](rds_data)
+    return seurat_object
 
-x = tuple(seurat_object.slots["assays"].items())[0][1]
-features = rownames(x.slots["features"])
 
-write_table = robjects.r["write.table"]
-write_table(barcodes, 
-            (DATA_DIR / Path('barcodes.tsv')).as_posix(),
-            quote = False, row_names=False, col_names=False)
-write_table(features, 
-            (DATA_DIR / Path('features.tsv')).as_posix(),
-            quote = False, row_names=False, col_names=False)
+def save_10x_data(seurat_object, data_dir: Path) -> Any:
+    mtx = robjects.r["GetAssayData"](seurat_object, assay="RNA", layer="counts")
+    robjects.r["write_fmm"](mtx, (data_dir / Path("matrix.mtx")).as_posix())
 
-mtx = scipy.io.mmread(DATA_DIR / Path("matrix.mtx"))
-barcodes = pd.read_csv(DATA_DIR / Path("barcodes.tsv"), header=None)
-features = pd.read_csv(DATA_DIR / Path("features.tsv"), header=None)
+    rownames = robjects.r["rownames"]
+    barcodes = rownames(seurat_object.slots["meta.data"])
 
-adata = AnnData(mtx.tocsr().T)
-adata.obs = barcodes
-adata.obs_names = barcodes[0]
-adata.obs.drop(adata.obs[[0]], axis=1, inplace=True)
-adata.var = features
-adata.var_names = features[0]
-adata.var.drop(adata.var[[0]], axis=1, inplace=True)
+    x = tuple(seurat_object.slots["assays"].items())[0][1]
+    features = rownames(x.slots["features"])
 
-adata.write_h5ad(DATA_DIR / "jk06.h5ad")
+    write_table = robjects.r["write.table"]
+    write_table(
+        barcodes,
+        (data_dir / Path("barcodes.tsv")).as_posix(),
+        quote=False,
+        row_names=False,
+        col_names=False,
+    )
+    write_table(
+        features,
+        (data_dir / Path("features.tsv")).as_posix(),
+        quote=False,
+        row_names=False,
+        col_names=False,
+    )
 
+
+def read_10x_data(data_dir: Path) -> tuple[coo_matrix, pd.DataFrame, pd.DataFrame]:
+    mtx = scipy.io.mmread(data_dir / Path("matrix.mtx"))
+    barcodes = pd.read_csv(data_dir / Path("barcodes.tsv"), header=None)
+    features = pd.read_csv(data_dir / Path("features.tsv"), header=None)
+    return coo_matrix(mtx), barcodes, features
+
+
+def create_adata(
+    mtx: coo_matrix, barcodes: pd.DataFrame, features: pd.DataFrame
+) -> AnnData:
+    adata = AnnData(mtx.tocsr().T)
+    adata.obs = barcodes
+    adata.obs_names = barcodes[0]  # type:ignore
+    adata.obs.drop(adata.obs[[0]], axis=1, inplace=True)  # type: ignore
+    adata.var = features
+    adata.var_names = features[0]  # type:ignore
+    adata.var.drop(adata.var[[0]], axis=1, inplace=True)  # type: ignore
+    return adata
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="extract 10x data from .rds files")
+    parser.add_argument("filename")
+    parser.add_argument("--datadir", default="data")
+    args = parser.parse_args()
+    filename = args.filename
+    if not Path(filename).exists():
+        print(f"Unable to find file: {filename}. Exiting.", file=sys.stderr)
+        return 1
+    data_dir = Path(args.datadir)
+    if not data_dir.exists() or not data_dir.is_dir():
+        print(f"{data_dir} is not a valid directory.  Exiting.")
+        return 1
+    print(f"Processing file: {args.filename}")
+    load_R_libraries()
+    print("R libraries loaded.")
+    seurat_object = read_rds_file(filename=filename)
+    print("Seurat object created")
+    save_10x_data(seurat_object=seurat_object, data_dir=data_dir)
+    print("10X data saved")
+    mtx, barcodes, features = read_10x_data(data_dir)
+    adata = create_adata(mtx=mtx, barcodes=barcodes, features=features)
+    print("adata created")
+    adata.write_h5ad(data_dir / "jk06.h5ad")
+    print("h5ad file written")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
