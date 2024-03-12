@@ -14,6 +14,7 @@ features*
 .Rhistory
 *.gz
 *.h5ad
+data/*
 
 Miniconda3-latest-Linux-x86_64.sh
 data/.ipynb_checkpoints/barcodes-checkpoint.tsv
