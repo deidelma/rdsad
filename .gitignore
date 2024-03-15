@@ -22,6 +22,8 @@ data/.ipynb_checkpoints/genes-checkpoint.tsv
 scripts/.ipynb_checkpoints/get_assays-checkpoint.R
 data/genes.tsv
 .ipynb_checkpoints/rdsad-checkpoint.ipynb
+tests/__pycache__/*
+rdsad/__pycache__/*
 rdsad/__pycache__/__init__.cpython-312.pyc
 rdsad/__pycache__/seurat.cpython-312.pyc
 tests/__pycache__/__init__.cpython-312.pyc
