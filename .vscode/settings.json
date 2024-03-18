@@ -5,6 +5,7 @@
         "barcodes",
         "datadir",
         "fname",
+        "loadr",
         "mmread",
         "mojaveazure",
         "myfile",

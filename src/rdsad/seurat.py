@@ -37,17 +37,21 @@ def load_R_libraries() -> None:
     load_library("SeuratDisk")
     load_library("fastMatMR")
 
+def is_instance(obj: Any, type_str: str) -> bool:
+    f = robjects.r("is")
+    result = f(obj, type_str)
+    return result[0]
 
 def convert_to_seurat(obj: Any) -> Any:
+    # if obj is a list, extract the first element
+    if robjects.r("class")(obj)[0] == 'list':
+        obj = obj.rx2(1)
     # if obj is a matrix, convert it to a SeuratObject
-    # get_desc: Callable[[Any], str] = robjects.r("str")  # type: ignore
-    # desc = get_desc(obj)
-    # need to use: is('dgCMatrix')
-    is_instance: Callable[[Any, str],bool] = robjects.r("is") # type: ignore
     if is_instance(obj, 'dgCMatrix'):
         # need to convert it to a seurat object
         return robjects.r("CreateSeuratObject")(obj)  # type: ignore
     elif is_instance(obj, "Seurat"):
+        # if its a Seurat object, just return it
         return obj
     else:
         # not a valid object for translation to Seurat
