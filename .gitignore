@@ -34,3 +34,7 @@ src/rdsad/__pycache__/seurat.cpython-311.pyc
 src/rdsad/__pycache__/seurat.cpython-311.pyc
 src/rdsad/__pycache__/__init__.cpython-311.pyc
 src/rdsad/__pycache__/seurat.cpython-311.pyc
+.ruff_cache/
+.virtual_documents/
+.ipynb_checkpoints/
+.virtual_documents/rdsad.ipynb
