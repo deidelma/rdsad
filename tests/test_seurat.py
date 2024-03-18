@@ -80,6 +80,10 @@ def test_read_rds_file() -> None:
     assert seurat_obj is not None
     assert seurat.is_instance(seurat_obj, "Seurat")
 
+@pytest.mark.skipif(
+    not Path("tests/data/pbmc.rds").exists(),
+    reason="Need to have pbmc.rds file in tests/data",
+)
 def test_read_canonical_seurat_file() -> None:
     seurat.load_R_libraries()
     file_path = Path("tests/data/pbmc.rds")
