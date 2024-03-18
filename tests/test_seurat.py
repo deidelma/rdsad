@@ -77,5 +77,12 @@ def test_read_rds_file() -> None:
     assert obj is not None
 
     seurat_obj = seurat.convert_to_seurat(obj)
-    assert robjects.r("is")(seurat_obj, 'Seurat')[0]
     assert seurat_obj is not None
+    assert seurat.is_instance(seurat_obj, "Seurat")
+
+def test_read_canonical_seurat_file() -> None:
+    seurat.load_R_libraries()
+    file_path = Path("tests/data/pbmc.rds")
+    obj = seurat.read_rds_file(file_path)
+    assert obj is not None
+    assert seurat.is_instance(obj, "Seurat") 
