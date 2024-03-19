@@ -1,10 +1,12 @@
 from pathlib import Path
+import tempfile
 import sys
 import os
 from typing import Any
 from rdsad import seurat
 import rpy2.robjects as robjects
 import pytest
+import pandas as pd
 
 
 @pytest.fixture
@@ -92,3 +94,30 @@ def test_read_canonical_seurat_file() -> None:
     obj = seurat.read_rds_file(file_path)
     assert obj is not None
     assert seurat.is_instance(obj, "Seurat")
+
+@pytest.mark.skipif(
+    not Path("tests/data/pbmc.rds").exists(),
+    reason="Need to have pbmc.rds file in tests/data",
+)
+def test_save_10x_data() -> None:
+    seurat.load_R_libraries()
+    file_path = Path("tests/data/pbmc.rds")
+    obj = seurat.read_rds_file(filename=file_path)
+    assert seurat.is_instance(obj, "Seurat")
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        dir_path = Path(tmp_dir)
+        seurat.save_10x_data(obj, dir_path)
+        matrix_path = Path(dir_path / "matrix.mtx")
+        features_path = Path(dir_path / "features.mtx")
+        barcodes_path = Path(dir_path / "barcodes.mtx")
+        assert matrix_path.exists()
+        assert barcodes_path.exists()
+        assert features_path.exists()
+
+        mtx, barcodes, features = seurat.read_10x_data(dir_path)
+        assert mtx is not None
+        assert barcodes is not None
+        assert features is not None
+
+        adata = seurat.create_adata(mtx, barcodes, features)
+        assert adata is not None
