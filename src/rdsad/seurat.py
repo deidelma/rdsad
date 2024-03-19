@@ -7,6 +7,7 @@ Module to handle manipulation of Seurat and related files.
 Based on rpy2
 
 """
+
 import tempfile
 from os import PathLike
 from pathlib import Path
@@ -16,6 +17,7 @@ import scipy.io
 from scipy.sparse import coo_matrix
 from anndata import AnnData
 import pandas as pd
+
 
 class LoadingFailed(Exception):
     """
@@ -70,15 +72,16 @@ def read_rds_file(filename: PathLike | str):
     assert isinstance(filename, str)
     return read_rds(filename)
 
+
 def save_10x_data(seurat_object, data_dir: Path) -> Any:
-    mtx = robjects.r["GetAssayData"](seurat_object, assay="RNA", layer="counts") # type: ignore
-    robjects.r["write_fmm"](mtx, (data_dir / Path("matrix.mtx")).as_posix()) # type: ignore
+    mtx = robjects.r["GetAssayData"](seurat_object, assay="RNA", layer="counts")  # type: ignore
+    robjects.r["write_fmm"](mtx, (data_dir / Path("matrix.mtx")).as_posix())  # type: ignore
 
     rownames = robjects.r["rownames"]
-    barcodes = rownames(seurat_object.slots["meta.data"]) # type: ignore
+    barcodes = rownames(seurat_object.slots["meta.data"])  # type: ignore
 
     x = tuple(seurat_object.slots["assays"].items())[0][1]
-    features = rownames(x.slots["features"]) # type: ignore
+    features = rownames(x.slots["features"])  # type: ignore
 
     write_table = robjects.r["write.table"]
     write_table(
@@ -87,20 +90,22 @@ def save_10x_data(seurat_object, data_dir: Path) -> Any:
         quote=False,
         row_names=False,
         col_names=False,
-    ) # type: ignore
+    )  # type: ignore
     write_table(
         features,
         (data_dir / Path("features.tsv")).as_posix(),
         quote=False,
         row_names=False,
         col_names=False,
-    ) # type:ignore
+    )  # type:ignore
+
 
 def read_10x_data(data_dir: Path) -> tuple[coo_matrix, pd.DataFrame, pd.DataFrame]:
     mtx = scipy.io.mmread(data_dir / Path("matrix.mtx"))
-    barcodes = pd.read_csv(data_dir / Path("barcodes.tsv"), header=None)
-    features = pd.read_csv(data_dir / Path("features.tsv"), header=None)
+    barcodes = pd.read_csv(data_dir / Path("barcodes.tsv"), header=None, sep="\t")
+    features = pd.read_csv(data_dir / Path("features.tsv"), header=None, sep="\t")
     return coo_matrix(mtx), barcodes, features
+
 
 def create_adata(
     mtx: coo_matrix, barcodes: pd.DataFrame, features: pd.DataFrame
