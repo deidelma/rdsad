@@ -31,3 +31,6 @@ RUN bash ./Miniconda3*.sh -b
 COPY ./scripts /home/meakins/scripts
 RUN conda init
 RUN ./rdsad-install.sh 
+
+USER meakins
+RUN pip install pytest
