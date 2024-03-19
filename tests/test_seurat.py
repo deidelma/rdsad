@@ -12,7 +12,7 @@ def test_rds_file():
     dir_path = Path("tests/data")
     if not dir_path.exists():
         Path.mkdir(dir_path)
-    
+
     rds_path = dir_path / Path("x.rds")
     filename = rds_path.with_suffix(".rds").as_posix()
     if not rds_path.exists():
@@ -43,7 +43,8 @@ def test_load_library() -> None:
 
 def test_load_R_libraries() -> None:
     # first ensure executing in right environment
-    assert "rdsad" in os.environ["CONDA_PREFIX"]
+    conda_prefix = os.environ["CONDA_PREFIX"]
+    assert conda_prefix in ["rdsad", "/home/meakins/miniconda3"]
     # now try loading the libraries
     try:
         seurat.load_R_libraries()
@@ -80,6 +81,7 @@ def test_read_rds_file() -> None:
     assert seurat_obj is not None
     assert seurat.is_instance(seurat_obj, "Seurat")
 
+
 @pytest.mark.skipif(
     not Path("tests/data/pbmc.rds").exists(),
     reason="Need to have pbmc.rds file in tests/data",
@@ -89,4 +91,4 @@ def test_read_canonical_seurat_file() -> None:
     file_path = Path("tests/data/pbmc.rds")
     obj = seurat.read_rds_file(file_path)
     assert obj is not None
-    assert seurat.is_instance(obj, "Seurat") 
+    assert seurat.is_instance(obj, "Seurat")
