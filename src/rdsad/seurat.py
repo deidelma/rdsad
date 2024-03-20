@@ -75,7 +75,8 @@ def read_rds_file(filename: PathLike | str):
 
 def save_10x_data(seurat_object, data_dir: Path) -> Any:
     mtx = robjects.r["GetAssayData"](seurat_object, assay="RNA", layer="counts")  # type: ignore
-    robjects.r["write_fmm"](mtx, (data_dir / Path("matrix.mtx")).as_posix())  # type: ignore
+    robjects.r("fastMatMR::write_fmm")(mtx, (data_dir / Path("matrix.mtx")).as_posix())  # type: ignore
+    # robjects.r["fastMatMR::write_fmm"](mtx, (data_dir / Path("matrix.mtx")).as_posix())  # type: ignore
 
     rownames = robjects.r["rownames"]
     barcodes = rownames(seurat_object.slots["meta.data"])  # type: ignore

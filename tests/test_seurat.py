@@ -6,7 +6,7 @@ from typing import Any
 from rdsad import seurat
 import rpy2.robjects as robjects
 import pytest
-import pandas as pd
+import scanpy as sc
 
 
 @pytest.fixture
@@ -105,14 +105,17 @@ def test_save_10x_data() -> None:
     obj = seurat.read_rds_file(filename=file_path)
     assert seurat.is_instance(obj, "Seurat")
     with tempfile.TemporaryDirectory() as tmp_dir:
+    # tmp_dir = Path("tests/data/crap")
+    # tmp_dir.mkdir()
         dir_path = Path(tmp_dir)
         seurat.save_10x_data(obj, dir_path)
         matrix_path = Path(dir_path / "matrix.mtx")
-        features_path = Path(dir_path / "features.mtx")
-        barcodes_path = Path(dir_path / "barcodes.mtx")
+        features_path = Path(dir_path / "features.tsv")
+        barcodes_path = Path(dir_path / "barcodes.tsv")
         assert matrix_path.exists()
         assert barcodes_path.exists()
         assert features_path.exists()
+    # tmp_dir.rmdir()
 
         mtx, barcodes, features = seurat.read_10x_data(dir_path)
         assert mtx is not None
@@ -121,3 +124,22 @@ def test_save_10x_data() -> None:
 
         adata = seurat.create_adata(mtx, barcodes, features)
         assert adata is not None
+
+@pytest.mark.skipif(
+    not Path("tests/data/JK06.rds").exists(),
+    reason="Need to have JK06.rds file in tests/data",
+)
+def test_seurat_to_h5ad() -> None:
+    seurat.load_R_libraries()
+    file_path = Path("tests/data/JK06.rds")
+    matrix_obj = seurat.read_rds_file(file_path)
+    obj = seurat.convert_to_seurat(matrix_obj)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+        h5ad_file_path = (temp_path / file_path.name).with_suffix(".h5ad")
+        seurat.seurat_to_h5ad(obj, h5ad_file_path)
+        assert h5ad_file_path.exists() and h5ad_file_path.is_file()
+
+        adata = sc.read_h5ad(h5ad_file_path)
+        assert adata is not None
+    
